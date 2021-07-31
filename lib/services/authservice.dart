@@ -7,14 +7,15 @@ class AuthService {
   //Handles Auth
   handleAuth() {
     return StreamBuilder(
-        stream: FirebaseAuth.instance.onAuthStateChanged,
-        builder: (BuildContext context, snapshot) {
-          if (snapshot.hasData) {
-            return DashboardPage();
-          } else {
-            return LoginPage();
-          }
-        });
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (BuildContext context, snapshot) {
+        if (snapshot.hasData) {
+          return DashboardPage();
+        } else {
+          return LoginPage();
+        }
+      },
+    );
   }
 
   //Sign out
@@ -28,8 +29,8 @@ class AuthService {
   }
 
   signInWithOTP(smsCode, verId) {
-    AuthCredential authCreds = PhoneAuthProvider.getCredential(
-        verificationId: verId, smsCode: smsCode);
+    AuthCredential authCreds =
+        PhoneAuthProvider.credential(verificationId: verId, smsCode: smsCode);
     signIn(authCreds);
   }
 }
