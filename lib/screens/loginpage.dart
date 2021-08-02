@@ -10,7 +10,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final formKey = new GlobalKey<FormState>();
 
-  String phoneNo, verificationId, smsCode;
+  String? phoneNo, verificationId, smsCode;
 
   bool codeSent = false;
 
@@ -18,41 +18,49 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Form(
-          key: formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                  padding: EdgeInsets.only(left: 25.0, right: 25.0),
-                  child: TextFormField(
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(hintText: 'Enter phone number'),
-                    onChanged: (val) {
-                      setState(() {
-                        this.phoneNo = val;
-                      });
-                    },
-                  )),
-                  codeSent ? Padding(
-                  padding: EdgeInsets.only(left: 25.0, right: 25.0),
-                  child: TextFormField(
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(hintText: 'Enter OTP'),
-                    onChanged: (val) {
-                      setState(() {
-                        this.smsCode = val;
-                      });
-                    },
-                  )) : Container(),
-              Padding(
-                  padding: EdgeInsets.only(left: 25.0, right: 25.0),
-                  child: RaisedButton(
-                      child: Center(child: codeSent ? Text('Login'):Text('Verify')),
-                      onPressed: () {
-                        codeSent ? AuthService().signInWithOTP(smsCode, verificationId):verifyPhone(phoneNo);
-                      }))
-            ],
-          )),
+        key: formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+                padding: EdgeInsets.only(left: 25.0, right: 25.0),
+                child: TextFormField(
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(hintText: 'Enter phone number'),
+                  onChanged: (val) {
+                    setState(() {
+                      this.phoneNo = val;
+                    });
+                  },
+                )),
+            codeSent
+                ? Padding(
+                    padding: EdgeInsets.only(left: 25.0, right: 25.0),
+                    child: TextFormField(
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(hintText: 'Enter OTP'),
+                      onChanged: (val) {
+                        setState(() {
+                          this.smsCode = val;
+                        });
+                      },
+                    ),
+                  )
+                : Container(),
+            Padding(
+              padding: EdgeInsets.only(left: 25.0, right: 25.0),
+              child: ElevatedButton(
+                child: Center(child: codeSent ? Text('Login') : Text('Verify')),
+                onPressed: () {
+                  codeSent
+                      ? AuthService().signInWithOTP(smsCode, verificationId)
+                      : verifyPhone(phoneNo);
+                },
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 
@@ -62,11 +70,11 @@ class _LoginPageState extends State<LoginPage> {
     };
 
     final PhoneVerificationFailed verificationfailed =
-        (AuthException authException) {
+        (FirebaseAuthException authException) {
       print('${authException.message}');
     };
 
-    final PhoneCodeSent smsSent = (String verId, [int forceResend]) {
+    final PhoneCodeSent smsSent = (String verId, [int? forceResend]) {
       this.verificationId = verId;
       setState(() {
         this.codeSent = true;
